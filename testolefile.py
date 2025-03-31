@@ -3,11 +3,6 @@ import zlib
 import struct
 
 
-email_pattern = re.compile(r'[\w\.-]+@[\w\.-]+')
-person_pattern = re.compile(r'\d{6}[-]\d{7}\b')
-num_pattern = re.compile(r'\b(01[016789]-?\d{4}-?\d{4}|0\d{1,2}-?\d{3}-?\d{4})\b')
-addr_pattern = re.compile(r'([가-힣]{2,6}(시|도)\s?[가-힣]{1,4}(군|구|시)\s?[가-힣0-9\-]+(읍|리|로|길)\s?\d{1,4})')
-card_pattern = re.compile(r'\b(?:\d{4}-){3}\d{4}\b')
 
 
 def get_hwp_text(filename):
@@ -73,7 +68,8 @@ def get_hwp_text(filename):
 
     return text
 
-#테스트
+# 테스트
+
 patterns = {
     'email' : r'[\w\.-]+@[\w\.-]+',
     'person' : r'\d{6}[-]\d{7}\b',
@@ -87,24 +83,30 @@ txt = get_hwp_text('testtest.hwp')
 result = {}
 for key, pattern in patterns.items():
     matches = re.findall(pattern, txt)
-    result[key] = matches
+    result[key] = matches                 #result 딕셔너리 구조 :{'email': ['test@example.com'], 'person': ['900101-1234567'] ...}
 
 
-summary = []
+summary = []                           #summury는 각 카테고리의 개수정보 포함한 리스트 (ex)['email: 2개', 'person: 1개', 'card: 1개']
 total_count = 0
 
-for category, items in result.items():
+for category, items in result.items():          
     if items:
         count = len(items)
         summary.append(f"{category}: {count}개")
         total_count += count
 
-if total_count > 0:
-    print(f"{total_count}개의 민감정보가 식별되었습니다. {summary}")
-    for i in summary:
-        print(i,' ', end='')
 
+if total_count > 0:
+    print(f"{total_count}개의 민감정보가 식별되었습니다.")
+    for i in summary:                    # summary 출력결과 :' email: 2개  person: 1개  card: 1개'
+        print(i,' ', end='')
+    print('\n')            
+
+    for key, value in result.items():        #민감정보 상세 내용 출력
+        if value:
+            print(f"{key}: {','.join(value)}")
+        else:
+            pass
 else:
     print("민감정보가 없습니다.")
-
 
